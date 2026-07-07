@@ -1,0 +1,143 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: travelai-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: travelai
+      MYSQL_CHARSET: utf8mb4
+      MYSQL_COLLATION: utf8mb4_unicode_ci
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./backend/sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
+    networks:
+      - travelai-network
+
+  redis:
+    image: redis:7.0
+    container_name: travelai-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: always
+    networks:
+      - travelai-network
+
+  api-gateway:
+    build: ./backend/travelai-api
+    container_name: travelai-api-gateway
+    ports:
+      - "8090:8090"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+    depends_on:
+      - mysql
+      - redis
+    restart: always
+    networks:
+      - travelai-network
+
+  user-service:
+    build: ./backend/travelai-user
+    container_name: travelai-user-service
+    ports:
+      - "8091:8091"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/travelai
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+    depends_on:
+      - mysql
+      - redis
+    restart: always
+    networks:
+      - travelai-network
+
+  trip-service:
+    build: ./backend/travelai-trip
+    container_name: travelai-trip-service
+    ports:
+      - "8092:8092"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/travelai
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+    depends_on:
+      - mysql
+      - redis
+    restart: always
+    networks:
+      - travelai-network
+
+  recommend-service:
+    build: ./backend/travelai-recommend
+    container_name: travelai-recommend-service
+    ports:
+      - "8093:8093"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/travelai
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+    depends_on:
+      - mysql
+      - redis
+    restart: always
+    networks:
+      - travelai-network
+
+  chat-service:
+    build: ./backend/travelai-chat
+    container_name: travelai-chat-service
+    ports:
+      - "8094:8094"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/travelai
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+    depends_on:
+      - mysql
+      - redis
+    restart: always
+    networks:
+      - travelai-network
+
+  frontend:
+    build: ./frontend
+    container_name: travelai-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - API_BASE_URL=http://localhost:8090
+    depends_on:
+      - api-gateway
+    restart: always
+    networks:
+      - travelai-network
+
+volumes:
+  mysql_data:
+  redis_data:
+
+networks:
+  travelai-network:
+    driver: bridge

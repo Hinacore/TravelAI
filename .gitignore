@@ -1,0 +1,67 @@
+# === IDE & Editor ===
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.DS_Store
+Thumbs.db
+
+# === Backend - Java/Maven ===
+**/target/
+**/build/
+*.jar
+*.war
+*.ear
+*.class
+*.log
+logs/
+*.log.*
+mvnw
+mvnw.cmd
+.mvn/
+
+# === Frontend - Node/Vue ===
+**/node_modules/
+**/dist/
+**/.vite/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.npm
+.cache/
+.parcel-cache/
+
+# === Environment & Secrets ===
+.env
+.env.local
+.env.*.local
+*.env
+# 排除 AI_KEY 中的密钥文件，但保留文件夹结构
+AI_KEY/*.env
+!AI_KEY/.gitkeep
+!AI_KEY/.env.example
+
+# === Database ===
+*.db
+*.sqlite
+*.sqlite3
+
+# === Test & Coverage ===
+coverage/
+.nyc_output/
+*.lcov
+
+# === OS ===
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# === Other ===
+*.bak
+*.tmp
+*.swp
+*.swo
+*~

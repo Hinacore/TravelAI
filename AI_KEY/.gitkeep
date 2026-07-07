@@ -1,0 +1,3 @@
+# 此文件用于保留 AI_KEY 文件夹结构
+# 实际的 API Key 文件 (.env) 不会上传到 GitHub
+# 请参考 .env.example 创建你本地的密钥配置文件
